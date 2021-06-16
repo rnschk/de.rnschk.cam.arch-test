@@ -1,0 +1,14 @@
+# IntelliJ
+.idea/
+*.iml
+
+# VSC
+.settings/
+.project
+.vscode
+.factorypath
+.classpath
+
+target/
+
+*.db
