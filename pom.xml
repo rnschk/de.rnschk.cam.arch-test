@@ -12,8 +12,8 @@
         <module>cam-db</module>
         <module>cam-api</module>
         <module>cam-webapp</module>
-        <module>cam-process-app-1</module>
-        <module>cam-process-app-2</module>
+        <module>process-1</module>
+        <module>process-2</module>
     </modules>
 
     <properties>
