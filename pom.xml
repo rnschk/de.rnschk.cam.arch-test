@@ -12,6 +12,7 @@
         <module>cam-db</module>
         <module>cam-api</module>
         <module>cam-webapp</module>
+        <module>external-handler</module>
         <module>process-1</module>
         <module>process-2</module>
     </modules>
