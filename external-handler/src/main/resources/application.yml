@@ -4,3 +4,11 @@ camunda.bpm.client:
   async-response-timeout: 30000
 
 logging.level.org.camunda.bpm.client: debug
+
+de:
+  viadee:
+    bpm:
+      camunda:
+        external-task:
+          retry-config:
+            default-behavior: R0/PT1M
