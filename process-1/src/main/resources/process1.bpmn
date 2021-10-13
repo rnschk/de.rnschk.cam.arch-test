@@ -8,6 +8,9 @@
       <bpmn:outgoing>Flow_110c2qs</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:serviceTask id="Delegate1Task" name="delegate1" camunda:asyncBefore="true" camunda:delegateExpression="${delegate1}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R0/PT1M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_110c2qs</bpmn:incoming>
       <bpmn:outgoing>Flow_1ev3yiq</bpmn:outgoing>
     </bpmn:serviceTask>
