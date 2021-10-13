@@ -21,7 +21,13 @@
         <dependency>
             <groupId>org.camunda.bpm.springboot</groupId>
             <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
-            <version>7.15.0</version>
+            <version>7.16.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.viadee.bpm.camunda</groupId>
+            <artifactId>external-task-retry-aspect-spring-boot-starter</artifactId>
+            <version>1.2.6</version>
         </dependency>
     </dependencies>
 
