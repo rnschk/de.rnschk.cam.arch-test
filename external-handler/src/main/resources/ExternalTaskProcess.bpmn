@@ -1,43 +1,152 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1fn75rx" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1fn75rx" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.9.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:collaboration id="Collaboration_0p6j24p">
     <bpmn:participant id="ExternalTaskProcessParticipant" name="External Task Process" processRef="ExternalTaskProcess" />
   </bpmn:collaboration>
   <bpmn:process id="ExternalTaskProcess" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1">
+    <bpmn:sequenceFlow id="Flow_0o8tx70" sourceRef="InstantIncidentTask" targetRef="Gateway_0i47p7q" />
+    <bpmn:sequenceFlow id="Flow_0shp6y4" sourceRef="StartStartEvent" targetRef="Gateway_0fmbczw" />
+    <bpmn:sequenceFlow id="Flow_0wv032e" sourceRef="Gateway_0fmbczw" targetRef="InstantIncidentTask" />
+    <bpmn:sequenceFlow id="Flow_0qhsvu6" sourceRef="Gateway_0fmbczw" targetRef="SomeRetriesTask" />
+    <bpmn:sequenceFlow id="Flow_0jee68q" sourceRef="Gateway_0i47p7q" targetRef="EndEndEvent" />
+    <bpmn:sequenceFlow id="Flow_1636fkb" sourceRef="SomeRetriesTask" targetRef="Gateway_0i47p7q" />
+    <bpmn:startEvent id="StartStartEvent" name="Start">
       <bpmn:outgoing>Flow_0shp6y4</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:endEvent id="Event_0hmoc68">
-      <bpmn:incoming>Flow_0o8tx70</bpmn:incoming>
+    <bpmn:endEvent id="EndEndEvent" name="End">
+      <bpmn:incoming>Flow_0jee68q</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="MytopicTask" name="my-topic" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:type="external" camunda:topic="my-topic">
+    <bpmn:parallelGateway id="Gateway_0fmbczw">
       <bpmn:incoming>Flow_0shp6y4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wv032e</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0qhsvu6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0c5rbx2</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="InstantIncidentTask" name="Instant Incident!" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:type="external" camunda:topic="instant-incident">
+      <bpmn:incoming>Flow_0wv032e</bpmn:incoming>
       <bpmn:outgoing>Flow_0o8tx70</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0o8tx70" sourceRef="MytopicTask" targetRef="Event_0hmoc68" />
-    <bpmn:sequenceFlow id="Flow_0shp6y4" sourceRef="StartEvent_1" targetRef="MytopicTask" />
+    <bpmn:parallelGateway id="Gateway_0i47p7q">
+      <bpmn:incoming>Flow_0o8tx70</bpmn:incoming>
+      <bpmn:incoming>Flow_1636fkb</bpmn:incoming>
+      <bpmn:incoming>Flow_16g08mw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jee68q</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0c5rbx2" sourceRef="Gateway_0fmbczw" targetRef="BusinessErrorTask" />
+    <bpmn:sequenceFlow id="Flow_16g08mw" sourceRef="BusinessErrorTask" targetRef="Gateway_0i47p7q" />
+    <bpmn:serviceTask id="BusinessErrorTask" name="Business Error" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:type="external" camunda:topic="topic-with-business-error">
+      <bpmn:incoming>Flow_0c5rbx2</bpmn:incoming>
+      <bpmn:outgoing>Flow_16g08mw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="SomeRetriesTask" name="Error, but has retries" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:type="external" camunda:topic="topic-with-retries">
+      <bpmn:incoming>Flow_0qhsvu6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1636fkb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="BusinessErrorsBoundaryEvent" name="Business&#10;Errors" attachedToRef="BusinessErrorTask">
+      <bpmn:outgoing>Flow_1wxe8xl</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0ujrvwj" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1wxe8xl" sourceRef="BusinessErrorsBoundaryEvent" targetRef="HandleBusinessErrorTask" />
+    <bpmn:sequenceFlow id="Flow_125g8xe" sourceRef="HandleBusinessErrorTask" targetRef="EndEndEvent1" />
+    <bpmn:endEvent id="EndEndEvent1" name="End">
+      <bpmn:incoming>Flow_125g8xe</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="HandleBusinessErrorTask" name="Handle Business&#10;Error">
+      <bpmn:incoming>Flow_1wxe8xl</bpmn:incoming>
+      <bpmn:outgoing>Flow_125g8xe</bpmn:outgoing>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0p6j24p">
       <bpmndi:BPMNShape id="Participant_1p9daxn_di" bpmnElement="ExternalTaskProcessParticipant" isHorizontal="true">
-        <dc:Bounds x="160" y="82" width="550" height="250" />
+        <dc:Bounds x="160" y="82" width="810" height="618" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0o8tx70_di" bpmnElement="Flow_0o8tx70">
-        <di:waypoint x="480" y="207" />
-        <di:waypoint x="542" y="207" />
+      <bpmndi:BPMNEdge id="Flow_125g8xe_di" bpmnElement="Flow_125g8xe">
+        <di:waypoint x="750" y="620" />
+        <di:waypoint x="802" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wxe8xl_di" bpmnElement="Flow_1wxe8xl">
+        <di:waypoint x="600" y="538" />
+        <di:waypoint x="600" y="620" />
+        <di:waypoint x="650" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16g08mw_di" bpmnElement="Flow_16g08mw">
+        <di:waypoint x="614" y="480" />
+        <di:waypoint x="711" y="480" />
+        <di:waypoint x="711" y="192" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c5rbx2_di" bpmnElement="Flow_0c5rbx2">
+        <di:waypoint x="417" y="192" />
+        <di:waypoint x="417" y="480" />
+        <di:waypoint x="514" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1636fkb_di" bpmnElement="Flow_1636fkb">
+        <di:waypoint x="614" y="324" />
+        <di:waypoint x="711" y="324" />
+        <di:waypoint x="711" y="192" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jee68q_di" bpmnElement="Flow_0jee68q">
+        <di:waypoint x="736" y="167" />
+        <di:waypoint x="802" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qhsvu6_di" bpmnElement="Flow_0qhsvu6">
+        <di:waypoint x="417" y="192" />
+        <di:waypoint x="417" y="324" />
+        <di:waypoint x="514" y="324" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wv032e_di" bpmnElement="Flow_0wv032e">
+        <di:waypoint x="442" y="167" />
+        <di:waypoint x="514" y="167" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0shp6y4_di" bpmnElement="Flow_0shp6y4">
-        <di:waypoint x="325" y="207" />
-        <di:waypoint x="380" y="207" />
+        <di:waypoint x="325" y="167" />
+        <di:waypoint x="392" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="289" y="189" width="36" height="36" />
+      <bpmndi:BPMNEdge id="Flow_0o8tx70_di" bpmnElement="Flow_0o8tx70">
+        <di:waypoint x="614" y="167" />
+        <di:waypoint x="686" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartStartEvent">
+        <dc:Bounds x="289" y="149" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="295" y="192" width="25" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0hmoc68_di" bpmnElement="Event_0hmoc68">
-        <dc:Bounds x="542" y="189" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0hmoc68_di" bpmnElement="EndEndEvent">
+        <dc:Bounds x="802" y="149" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="810" y="192" width="20" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1tbzxhj_di" bpmnElement="MytopicTask">
-        <dc:Bounds x="380" y="167" width="100" height="80" />
+      <bpmndi:BPMNShape id="Gateway_0o8pka4_di" bpmnElement="Gateway_0fmbczw">
+        <dc:Bounds x="392" y="142" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tbzxhj_di" bpmnElement="InstantIncidentTask">
+        <dc:Bounds x="514" y="127" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1emwjn9_di" bpmnElement="Gateway_0i47p7q">
+        <dc:Bounds x="686" y="142" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gadgzh_di" bpmnElement="BusinessErrorTask">
+        <dc:Bounds x="514" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qmxwe7_di" bpmnElement="SomeRetriesTask">
+        <dc:Bounds x="514" y="284" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0xsttvx_di" bpmnElement="EndEndEvent1">
+        <dc:Bounds x="802" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="810" y="645" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0akubyt_di" bpmnElement="HandleBusinessErrorTask">
+        <dc:Bounds x="650" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_031dn40_di" bpmnElement="BusinessErrorsBoundaryEvent">
+        <dc:Bounds x="582" y="502" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="607" y="536" width="46" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
