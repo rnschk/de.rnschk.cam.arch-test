@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableProcessApplication
+@EnableProcessApplication("process-app-2")
 public class ProcessApp2 {
 
 	public static void main(String[] args) {
